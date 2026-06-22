@@ -1,65 +1,121 @@
-name: Log Git Diff and Deploy SpringAIAPP
-
+name: Log Git Diff and Deploy SpringAI APP with Docker Compose
+ 
 on:
-  push:
-    tags:
-      - 'v*'
 
+  push:
+
+    tags:
+
+      - 'v*'
+ 
 jobs:
-  log-diff:
+
+  deploy:
+
     runs-on: self-hosted
 
     steps:
+
       - name: Checkout repository (full history)
+
         uses: actions/checkout@v4
+
         with:
+
           fetch-depth: 0
-
+ 
       - name: Run diff logger
+
         run: node scripts/log-diff.js
+
         env:
+
           BEFORE_SHA: ${{ github.event.before }}
+
           AFTER_SHA: ${{ github.event.after }}
+
           REPO_NAME: ${{ github.repository }}
+
           PUSHER: ${{ github.actor }}
+
           REF: ${{ github.ref }}
-
+ 
       - name: Upload diff log as artifact
+
         uses: actions/upload-artifact@v4
+
         with:
+
           name: git-diff-log-${{ github.run_id }}
+
           path: push-logs/*.log
+
           if-no-files-found: ignore
+ 
+      - name: Stop existing containers
 
-
-      - name: Build Docker Image from dockerfile
         run: |
-          sudo docker build -t springaiapp:latest .
 
+          sudo docker-compose down || true
 
-      - name: Run Docker Container
+        continue-on-error: true
+ 
+      - name: Build and Start services with Docker Compose
+
         run: |
-          sudo docker run -d \
-            --name springaiapp \
-            --restart unless-stopped \
-            -p 9090:9090 \
-            springaiapp:latest
 
-      - name: Wait for Application Startup
-        run: |
-          sleep 15
+          sudo docker-compose up -d --build
 
-      - name: Verify API Response
-        run: |
-          curl -i http://localhost:9090/
+        env:
 
-      - name: Verify HTTP Status Code
-        run: |
-          STATUS=$(curl -o /dev/null -s -w "%{http_code}" http://localhost:9090/)
-          echo "HTTP Status: $STATUS"
-          test "$STATUS" = "200"
+          DB_NAME: ${{ secrets.DB_NAME || 'banking_assistant' }}
 
-      - name: Verify Deployment
+          DB_USER: ${{ secrets.DB_USER || 'banking_user' }}
+
+          DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
+
+          JWT_SECRET: ${{ secrets.JWT_SECRET }}
+
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+
+          CORS_ALLOWED_ORIGINS: ${{ secrets.CORS_ALLOWED_ORIGINS || 'http://localhost:4200,http://localhost:8081' }}
+ 
+      - name: Wait for services to be healthy
+
         run: |
-          sudo docker ps
-          sudo  docker logs springaiapp --tail 20
+
+          echo "Waiting for services to start..."
+
+          sleep 20
+
+          # Check database
+
+          echo "Checking database..."
+
+          sudo docker-compose exec -T db pg_isready -U banking_user || exit 1
+
+          # Check backend
+
+          echo "Checking backend..."
+
+          for i in {1..30}; do
+
+            if curl -f http://localhost:9090/actuator/health > /dev/null 2>&1; then
+
+              echo "Backend is healthy"
+
+              break
+
+            fi
+
+            echo "Attempt $i: Backend not ready yet..."
+
+            sleep 2
+
+          done
+ 
+     
+    
+     
+ 
+     
