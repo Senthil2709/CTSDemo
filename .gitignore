@@ -1,5 +1,4 @@
 # Maven
-banking-assistant/backend/resources/db
 banking-assistant/backend/target/
 *.class
 *.jar

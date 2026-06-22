@@ -31,8 +31,6 @@ jobs:
           path: push-logs/*.log
           if-no-files-found: ignore
 
-      - name: Build Spring Boot JAR
-        run: mvn clean package -DskipTests
 
       - name: Build Docker Image
         run: |
