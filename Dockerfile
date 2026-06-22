@@ -3,6 +3,7 @@ FROM maven:3.9.6-eclipse-temurin-17 AS build
 WORKDIR /build
 
 
+COPY banking-assistant/backend/pom.xml ./
 COPY banking-assistant/backend/src ./src
 RUN mvn -B -q clean package -DskipTests
 
