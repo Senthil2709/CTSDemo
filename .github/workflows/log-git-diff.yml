@@ -32,7 +32,7 @@ jobs:
           if-no-files-found: ignore
 
 
-      - name: Build Docker Image
+      - name: Build Docker Image from dockerfile
         run: |
           sudo docker build -t springAIAPP:latest .
 
