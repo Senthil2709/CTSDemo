@@ -1,0 +1,38 @@
+<div class="section-eyebrow">Module 7 - Loan Workflow</div>
+<h1 style="font-size:1.5rem;">Loans</h1>
+
+<app-loan-application (applied)="refresh()"></app-loan-application>
+
+<div class="card-plain mt-3">
+  <h3 style="font-size:1.05rem;">Your loan applications</h3>
+
+  <div *ngIf="loading" class="empty-state">Loading...</div>
+
+  <table class="table-ledger" *ngIf="!loading">
+    <thead>
+      <tr><th>Type</th><th>Principal</th><th>Rate</th><th>Tenure</th><th>EMI</th><th>Status</th><th>Applied</th><th>Notes</th></tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let loan of loans">
+        <td>{{ loan.loanType }}</td>
+        <td class="amount">₹{{ loan.principalAmount | number:'1.0-0' }}</td>
+        <td class="amount">{{ loan.interestRate }}%</td>
+        <td>{{ loan.tenureMonths }} mo</td>
+        <td class="amount">₹{{ loan.emiAmount | number:'1.2-2' }}</td>
+        <td>
+          <span class="status-stamp"
+                [class.status-pending]="loan.status === 'PENDING_APPROVAL'"
+                [class.status-approved]="loan.status === 'APPROVED'"
+                [class.status-rejected]="loan.status === 'REJECTED'"
+                [class.status-disbursed]="loan.status === 'DISBURSED'"
+                [class.status-draft]="loan.status === 'DRAFT'">
+            <span class="dot"></span>{{ loan.status }}
+          </span>
+        </td>
+        <td>{{ loan.createdAt | date:'dd MMM yyyy' }}</td>
+        <td style="color: var(--ink-600); font-size:0.8rem;">{{ loan.decisionNotes }}</td>
+      </tr>
+      <tr *ngIf="!loans.length"><td colspan="8" style="color: var(--ink-600);">No loan applications yet.</td></tr>
+    </tbody>
+  </table>
+</div>

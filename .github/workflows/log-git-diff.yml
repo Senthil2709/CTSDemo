@@ -1,0 +1,71 @@
+name: Log Git Diff and Deploy SpringAIAPP
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+jobs:
+  log-diff:
+    runs-on: self-hosted
+
+    steps:
+      - name: Checkout repository (full history)
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Run diff logger
+        run: node scripts/log-diff.js
+        env:
+          BEFORE_SHA: ${{ github.event.before }}
+          AFTER_SHA: ${{ github.event.after }}
+          REPO_NAME: ${{ github.repository }}
+          PUSHER: ${{ github.actor }}
+          REF: ${{ github.ref }}
+
+      - name: Upload diff log as artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: git-diff-log-${{ github.run_id }}
+          path: push-logs/*.log
+          if-no-files-found: ignore
+
+      - name: Build Spring Boot JAR
+        run: mvn clean package -DskipTests
+
+      - name: Build Docker Image
+        run: |
+          docker build -t springAIAPP:latest .
+
+      - name: Stop Existing Container
+        run: |
+          docker stop springAIAPP || true
+          docker rm springAIAPP || true
+
+      - name: Run Docker Container
+        run: |
+          docker run -d \
+            --name springAIAPP \
+            --restart unless-stopped \
+            -p 9090:9090 \
+            springAIAPP:latest
+
+      - name: Wait for Application Startup
+        run: |
+          sleep 15
+
+      - name: Verify API Response
+        run: |
+          curl -i http://localhost:9090/
+
+      - name: Verify HTTP Status Code
+        run: |
+          STATUS=$(curl -o /dev/null -s -w "%{http_code}" http://localhost:9090/)
+          echo "HTTP Status: $STATUS"
+          test "$STATUS" = "200"
+
+      - name: Verify Deployment
+        run: |
+          docker ps
+          docker logs springAIAPP --tail 20

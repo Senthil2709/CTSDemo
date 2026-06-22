@@ -1,0 +1,52 @@
+<div class="section-eyebrow">Module 7 - Approval Workflow</div>
+<h1 style="font-size:1.5rem;">Approval queue</h1>
+<p style="color: var(--ink-600);">Pending loans and service requests awaiting a Relationship Manager or Branch Admin decision.</p>
+
+<div *ngIf="loading" class="empty-state">Loading approval queue...</div>
+
+<div *ngIf="!loading">
+  <div class="card-plain mb-3">
+    <h3 style="font-size:1.0rem;">Pending loans ({{ pendingLoans.length }})</h3>
+    <div *ngIf="!pendingLoans.length" style="color: var(--ink-600); font-size:0.9rem;">Nothing pending right now.</div>
+
+    <div *ngFor="let loan of pendingLoans" class="ledger-card">
+      <div class="d-flex justify-content-between flex-wrap gap-2">
+        <div>
+          <div style="font-weight:600;">{{ loan.loanType }} loan · ₹{{ loan.principalAmount | number:'1.0-0' }}</div>
+          <div style="font-size:0.82rem; color: var(--ink-600);">{{ loan.tenureMonths }} months · {{ loan.interestRate }}% p.a. · EMI ₹{{ loan.emiAmount | number:'1.2-2' }}</div>
+          <div style="font-size:0.8rem; color: var(--ink-600);" *ngIf="loan.purpose">Purpose: {{ loan.purpose }}</div>
+        </div>
+        <span class="status-stamp status-pending"><span class="dot"></span>Pending</span>
+      </div>
+      <div class="ledger-stub"></div>
+      <div class="d-flex gap-2 flex-wrap align-items-center">
+        <input type="text" class="form-control form-control-sm" style="max-width:280px;"
+               placeholder="Decision notes (optional)" [(ngModel)]="notesByLoan[loan.id]">
+        <button class="btn btn-sm btn-ledger" [disabled]="busyId === loan.id" (click)="decideLoan(loan, 'APPROVED')">Approve</button>
+        <button class="btn btn-sm btn-outline-danger" [disabled]="busyId === loan.id" (click)="decideLoan(loan, 'REJECTED')">Reject</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="card-plain">
+    <h3 style="font-size:1.0rem;">Pending service requests ({{ pendingRequests.length }})</h3>
+    <div *ngIf="!pendingRequests.length" style="color: var(--ink-600); font-size:0.9rem;">Nothing pending right now.</div>
+
+    <div *ngFor="let req of pendingRequests" class="ledger-card">
+      <div class="d-flex justify-content-between flex-wrap gap-2">
+        <div>
+          <div style="font-weight:600;">{{ req.requestType }} request</div>
+          <div style="font-size:0.8rem; color: var(--ink-600);">Submitted {{ req.createdAt | date:'dd MMM yyyy' }}</div>
+        </div>
+        <span class="status-stamp status-pending"><span class="dot"></span>Pending</span>
+      </div>
+      <div class="ledger-stub"></div>
+      <div class="d-flex gap-2 flex-wrap align-items-center">
+        <input type="text" class="form-control form-control-sm" style="max-width:280px;"
+               placeholder="Decision notes (optional)" [(ngModel)]="notesByRequest[req.id]">
+        <button class="btn btn-sm btn-ledger" [disabled]="busyId === req.id" (click)="decideRequest(req, 'APPROVED')">Approve</button>
+        <button class="btn btn-sm btn-outline-danger" [disabled]="busyId === req.id" (click)="decideRequest(req, 'REJECTED')">Reject</button>
+      </div>
+    </div>
+  </div>
+</div>

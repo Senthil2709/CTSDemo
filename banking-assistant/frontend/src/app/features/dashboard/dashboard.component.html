@@ -1,0 +1,105 @@
+<div *ngIf="loading" class="empty-state">
+  <span class="spinner-ledger" style="border-color: rgba(31,111,92,0.3); border-top-color: var(--ledger-green);"></span>
+  <p class="mt-2">Loading your accounts...</p>
+</div>
+
+<div *ngIf="!loading">
+  <div class="section-eyebrow">Overview</div>
+  <h1 style="font-size:1.6rem;">Good to see you, {{ authService.currentAuth?.fullName }}</h1>
+
+  <div class="row g-3 mt-3">
+    <div class="col-md-4">
+      <div class="ledger-card">
+        <div class="ledger-label">Total balance across accounts</div>
+        <div class="amount amount-credit" style="font-size:1.8rem;">₹{{ totalBalance | number:'1.2-2' }}</div>
+        <div class="ledger-stub"></div>
+        <div class="ledger-label">30-day in / out</div>
+        <div class="d-flex justify-content-between">
+          <span class="amount amount-credit">+₹{{ (spending?.totalCredits || 0) | number:'1.0-0' }}</span>
+          <span class="amount amount-debit">-₹{{ (spending?.totalDebits || 0) | number:'1.0-0' }}</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-md-4">
+      <div class="ledger-card">
+        <div class="ledger-label">Account tier</div>
+        <div style="font-size:1.3rem; font-weight:600; color: var(--ink-navy);">{{ upgrade?.currentTier }}</div>
+        <div class="ledger-stub"></div>
+        <ng-container *ngIf="upgrade?.eligibleForUpgrade">
+          <div class="status-stamp status-approved mb-2"><span class="dot"></span>Eligible for {{ upgrade?.recommendedTier }}</div>
+          <div *ngIf="!upgradeRequested">
+            <button class="btn btn-sm btn-outline-ledger" [disabled]="requestingUpgrade" (click)="requestUpgrade()">
+              Request upgrade
+            </button>
+          </div>
+          <div *ngIf="upgradeRequested" style="font-size:0.8rem; color: var(--ledger-green);">
+            Upgrade request submitted for review.
+          </div>
+        </ng-container>
+        <div style="font-size:0.82rem; color: var(--ink-600);">{{ upgrade?.reasons?.[0] }}</div>
+      </div>
+    </div>
+
+    <div class="col-md-4">
+      <div class="ledger-card">
+        <div class="ledger-label">AI recommendation</div>
+        <div style="font-size:0.92rem;">{{ recommendation }}</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="row g-3 mt-1">
+    <div class="col-md-7">
+      <div class="card-plain">
+        <h3 style="font-size:1.05rem;">Your accounts</h3>
+        <table class="table-ledger">
+          <thead>
+            <tr><th>Account</th><th>Type</th><th>Balance</th><th>Status</th><th></th></tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let acc of accounts">
+              <td class="mono">{{ acc.accountNumber }}</td>
+              <td>{{ acc.accountType }}</td>
+              <td class="amount">₹{{ acc.balance | number:'1.2-2' }}</td>
+              <td><span class="status-stamp status-active"><span class="dot"></span>{{ acc.status }}</span></td>
+              <td><button class="btn btn-sm btn-outline-ledger" (click)="viewTransactions(acc.id)">View</button></td>
+            </tr>
+          </tbody>
+        </table>
+
+        <h3 style="font-size:1.0rem; margin-top:1.2rem;">Recent transactions</h3>
+        <table class="table-ledger">
+          <thead><tr><th>Date</th><th>Description</th><th>Category</th><th>Amount</th></tr></thead>
+          <tbody>
+            <tr *ngFor="let t of recentTransactions">
+              <td>{{ t.transactedAt | date:'dd MMM, h:mm a' }}</td>
+              <td>{{ t.description }}</td>
+              <td>{{ t.category }}</td>
+              <td class="amount" [class.amount-credit]="t.type === 'CREDIT'" [class.amount-debit]="t.type === 'DEBIT'">
+                {{ t.type === 'CREDIT' ? '+' : '-' }}₹{{ t.amount | number:'1.2-2' }}
+              </td>
+            </tr>
+            <tr *ngIf="!recentTransactions.length"><td colspan="4" style="color: var(--ink-600);">No transactions yet.</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="col-md-5">
+      <div class="card-plain">
+        <h3 style="font-size:1.05rem;">Spending by category (30d)</h3>
+        <div *ngIf="!spendingCategories.length" style="color: var(--ink-600); font-size:0.88rem;">No spending recorded yet.</div>
+        <div *ngFor="let c of spendingCategories" class="mb-2">
+          <div class="d-flex justify-content-between" style="font-size:0.85rem;">
+            <span>{{ c.category }}</span>
+            <span class="amount">₹{{ c.amount | number:'1.0-0' }}</span>
+          </div>
+          <div style="background:#EEEDE8; border-radius:6px; height:8px; overflow:hidden;">
+            <div style="background: var(--amber-stamp); height:8px;" [style.width.%]="c.pct"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

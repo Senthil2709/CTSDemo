@@ -1,0 +1,34 @@
+<div class="section-eyebrow">Module 5 - Semantic Policy Knowledge Base</div>
+<h1 style="font-size:1.5rem;">Policy &amp; FAQs</h1>
+<p style="color: var(--ink-600);">Ask anything about account terms, loan eligibility, KYC, fees, or grievance redressal.</p>
+
+<div class="card-plain">
+  <div class="d-flex gap-2">
+    <input type="text" class="form-control" placeholder="e.g. What is the minimum balance for a savings account?"
+           [(ngModel)]="question" (keydown.enter)="ask()">
+    <button class="btn btn-ledger" (click)="ask()" [disabled]="loading || !question.trim()">
+      <span class="spinner-ledger me-2" *ngIf="loading"></span>Ask
+    </button>
+  </div>
+
+  <div class="d-flex flex-wrap gap-2 mt-2" *ngIf="!result">
+    <button *ngFor="let q of suggestedQuestions" class="btn btn-sm btn-outline-secondary" (click)="ask(q)">{{ q }}</button>
+  </div>
+
+  <div class="alert alert-danger py-2 mt-3" *ngIf="errorMessage">{{ errorMessage }}</div>
+</div>
+
+<div class="card-plain mt-3" *ngIf="result">
+  <div class="ledger-label">Answer</div>
+  <p style="font-size:0.95rem;">{{ result.answer }}</p>
+
+  <div class="ledger-stub" *ngIf="result.sources?.length"></div>
+  <div *ngIf="result.sources?.length">
+    <div class="ledger-label">Sources</div>
+    <div class="d-flex flex-wrap gap-2">
+      <span *ngFor="let s of result.sources" class="status-stamp status-draft">
+        <span class="dot"></span>{{ s.title }}
+      </span>
+    </div>
+  </div>
+</div>

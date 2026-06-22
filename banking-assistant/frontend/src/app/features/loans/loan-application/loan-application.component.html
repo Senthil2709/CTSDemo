@@ -1,0 +1,47 @@
+<div class="card-plain">
+  <h3 style="font-size:1.05rem;">Apply for a loan</h3>
+  <form [formGroup]="form" (ngSubmit)="submit()">
+    <div class="row g-3">
+      <div class="col-md-3">
+        <label class="form-label">Loan type</label>
+        <select class="form-select" formControlName="loanType">
+          <option value="PERSONAL">Personal</option>
+          <option value="HOME">Home</option>
+          <option value="AUTO">Auto</option>
+        </select>
+      </div>
+      <div class="col-md-3">
+        <label class="form-label">Principal amount (₹)</label>
+        <input type="number" class="form-control" formControlName="principalAmount">
+      </div>
+      <div class="col-md-3">
+        <label class="form-label">Tenure (months)</label>
+        <input type="number" class="form-control" formControlName="tenureMonths">
+      </div>
+      <div class="col-md-3">
+        <label class="form-label">Purpose</label>
+        <input type="text" class="form-control" formControlName="purpose" placeholder="e.g. home renovation">
+      </div>
+    </div>
+
+    <div class="ledger-stub"></div>
+
+    <div class="d-flex align-items-center justify-content-between flex-wrap gap-3">
+      <div *ngIf="emiPreview">
+        <span class="ledger-label">Indicative EMI</span>
+        <div class="amount" style="font-size:1.3rem; color: var(--ink-navy);">₹{{ emiPreview.emi | number:'1.2-2' }}/mo</div>
+        <div style="font-size:0.78rem; color: var(--ink-600);">
+          Total interest ₹{{ emiPreview.totalInterest | number:'1.0-0' }} · Total payable ₹{{ emiPreview.totalPayment | number:'1.0-0' }}
+        </div>
+      </div>
+
+      <button type="submit" class="btn btn-ledger" [disabled]="submitting">
+        <span class="spinner-ledger me-2" *ngIf="submitting"></span>
+        Submit application
+      </button>
+    </div>
+
+    <div class="alert alert-danger py-2 mt-3" *ngIf="errorMessage">{{ errorMessage }}</div>
+    <div class="alert alert-success py-2 mt-3" *ngIf="successMessage">{{ successMessage }}</div>
+  </form>
+</div>

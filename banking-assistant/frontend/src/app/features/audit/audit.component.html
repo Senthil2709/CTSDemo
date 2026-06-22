@@ -1,0 +1,66 @@
+<div class="section-eyebrow">MCP Audit Intelligence</div>
+<h1 style="font-size:1.5rem;">Audit Assistant</h1>
+<p style="color: var(--ink-600);">Ask compliance and audit questions. The assistant uses MCP tools to query live banking data.</p>
+
+<div class="card-plain">
+  <div class="d-flex gap-2">
+    <input
+      type="text"
+      class="form-control"
+      placeholder="e.g. Show me all flagged transactions this month"
+      [(ngModel)]="question"
+      (keydown.enter)="ask()"
+      [disabled]="loading">
+    <button class="btn btn-ledger" (click)="ask()" [disabled]="loading || !question.trim()">
+      <span class="spinner-ledger me-2" *ngIf="loading"></span>
+      {{ loading ? 'Running…' : 'Ask' }}
+    </button>
+  </div>
+
+  <div class="d-flex flex-wrap gap-2 mt-2" *ngIf="!result && !loading">
+    <button
+      *ngFor="let q of suggestedQuestions"
+      class="btn btn-sm btn-outline-secondary"
+      (click)="ask(q)">
+      {{ q }}
+    </button>
+  </div>
+
+  <div class="alert alert-danger py-2 mt-3" *ngIf="errorMessage">{{ errorMessage }}</div>
+</div>
+
+<ng-container *ngIf="result">
+  <!-- Answer -->
+  <div class="card-plain mt-3">
+    <div class="ledger-label">Answer</div>
+    <p style="font-size:0.95rem; white-space: pre-wrap;">{{ result.answer }}</p>
+  </div>
+
+  <!-- MCP Tool Trace -->
+  <div class="card-plain mt-3" *ngIf="result.toolCalls?.length">
+    <div class="d-flex align-items-center justify-content-between">
+      <div class="ledger-label">MCP Tool Calls ({{ result.toolCalls!.length }})</div>
+      <button class="btn btn-sm btn-outline-secondary" (click)="expandedTools = !expandedTools">
+        {{ expandedTools ? 'Hide' : 'Show' }} trace
+      </button>
+    </div>
+
+    <div *ngIf="expandedTools" class="mt-2">
+      <div
+        *ngFor="let tc of result.toolCalls; let i = index"
+        style="border-left: 3px solid var(--accent-teal, #2ECC71); padding-left: 12px; margin-bottom: 14px;">
+
+        <div class="d-flex align-items-center gap-2 mb-1">
+          <span class="status-stamp status-active"><span class="dot"></span>{{ tc.tool }}</span>
+          <small style="color: var(--ink-500);">Call #{{ i + 1 }}</small>
+        </div>
+
+        <div class="ledger-label mt-1">Input</div>
+        <pre style="font-size:0.78rem; background:var(--surface-1,#f4f6f5); padding:8px; border-radius:6px; overflow-x:auto;">{{ tc.input | json }}</pre>
+
+        <div class="ledger-label mt-1">Output</div>
+        <pre style="font-size:0.78rem; background:var(--surface-1,#f4f6f5); padding:8px; border-radius:6px; overflow-x:auto; max-height: 200px;">{{ formatToolOutput(tc.output) }}</pre>
+      </div>
+    </div>
+  </div>
+</ng-container>

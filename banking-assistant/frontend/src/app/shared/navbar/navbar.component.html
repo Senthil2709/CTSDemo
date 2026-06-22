@@ -1,0 +1,25 @@
+<div class="app-sidebar">
+  <div class="brand">
+    <div class="brand-mark">L</div>
+    <div>
+      <div class="brand-name">Ledger AI</div>
+      <div class="brand-sub">Banking Assistant</div>
+    </div>
+  </div>
+
+  <nav class="sidebar-nav">
+    <a routerLink="/dashboard" routerLinkActive="active"><i class="bi bi-grid-1x2"></i> Dashboard</a>
+    <a routerLink="/chat" routerLinkActive="active"><i class="bi bi-chat-dots"></i> Ask the Assistant</a>
+    <a routerLink="/loans" routerLinkActive="active"><i class="bi bi-cash-coin"></i> Loans</a>
+    <a routerLink="/financial-plan" routerLinkActive="active"><i class="bi bi-graph-up-arrow"></i> Financial Plan</a>
+    <a routerLink="/policy" routerLinkActive="active"><i class="bi bi-shield-check"></i> Policy &amp; FAQs</a>
+    <a routerLink="/audit" routerLinkActive="active"><i class="bi bi-search"></i> Audit Assistant</a>
+    <a *ngIf="isStaff" routerLink="/approvals" routerLinkActive="active"><i class="bi bi-clipboard-check"></i> Approval Queue</a>
+  </nav>
+
+  <div class="sidebar-footer">
+    <div class="mb-1" style="color:#DCE6E2; font-weight:500;">{{ fullName }}</div>
+    <div class="mb-2">{{ tier }}</div>
+    <a href="javascript:void(0)" (click)="logout()" style="color:#B9C9C4;"><i class="bi bi-box-arrow-left"></i> Sign out</a>
+  </div>
+</div>

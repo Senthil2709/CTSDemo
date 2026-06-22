@@ -1,0 +1,27 @@
+# Maven
+banking-assistant/backend/resources/db
+banking-assistant/backend/target/
+*.class
+*.jar
+*.war
+
+# Node
+banking-assistant/frontend/node_modules/
+banking-assistant/frontend/dist/
+banking-assistant/frontend/.angular/
+
+# Secrets
+.mcp.json
+
+# Logs
+*.log
+nohup.out
+
+# IDE
+.idea/
+*.iml
+.vscode/
+
+# OS
+.DS_Store
+*.tar.gz

@@ -1,0 +1,123 @@
+<div class="section-eyebrow">Module 6 - AI Financial Plan Generation</div>
+<h1 style="font-size:1.5rem;">Build a financial plan</h1>
+
+<div class="card-plain">
+  <form [formGroup]="form" (ngSubmit)="generate()">
+    <div class="row g-3">
+      <div class="col-md-3">
+        <label class="form-label">Monthly income (₹)</label>
+        <input type="number" class="form-control" formControlName="monthlyIncome">
+      </div>
+      <div class="col-md-3">
+        <label class="form-label">Monthly expenses (₹)</label>
+        <input type="number" class="form-control" formControlName="monthlyExpenses">
+      </div>
+      <div class="col-md-3">
+        <label class="form-label">Existing monthly EMI (₹)</label>
+        <input type="number" class="form-control" formControlName="existingMonthlyEmi">
+      </div>
+      <div class="col-md-3">
+        <label class="form-label">Risk appetite</label>
+        <select class="form-select" formControlName="riskAppetite">
+          <option value="CONSERVATIVE">Conservative</option>
+          <option value="MODERATE">Moderate</option>
+          <option value="AGGRESSIVE">Aggressive</option>
+        </select>
+      </div>
+
+      <div class="col-md-3">
+        <label class="form-label">Goal</label>
+        <select class="form-select" formControlName="goal">
+          <option value="HOME_PURCHASE">Home purchase</option>
+          <option value="EDUCATION">Education</option>
+          <option value="RETIREMENT">Retirement</option>
+          <option value="EMERGENCY_FUND">Emergency fund</option>
+          <option value="VEHICLE_PURCHASE">Vehicle purchase</option>
+          <option value="OTHER">Other</option>
+        </select>
+      </div>
+      <div class="col-md-3">
+        <label class="form-label">Timeline (months)</label>
+        <input type="number" class="form-control" formControlName="timelineMonths">
+      </div>
+      <div class="col-md-3">
+        <label class="form-label">Target amount (₹, optional)</label>
+        <input type="number" class="form-control" formControlName="targetAmount">
+      </div>
+      <div class="col-md-3 d-flex align-items-end">
+        <button type="submit" class="btn btn-ledger w-100" [disabled]="loading">
+          <span class="spinner-ledger me-2" *ngIf="loading"></span>
+          Generate plan
+        </button>
+      </div>
+    </div>
+    <div class="alert alert-danger py-2 mt-3" *ngIf="errorMessage">{{ errorMessage }}</div>
+  </form>
+</div>
+
+<div *ngIf="result" class="mt-3">
+  <div class="row g-3">
+    <div class="col-md-4">
+      <div class="ledger-card">
+        <div class="ledger-label">Recommended monthly savings</div>
+        <div class="amount amount-credit" style="font-size:1.6rem;">₹{{ result.recommendedMonthlySavings | number:'1.0-0' }}</div>
+        <div class="ledger-stub"></div>
+        <div class="ledger-label">Current monthly surplus</div>
+        <div class="amount">₹{{ result.monthlySurplus | number:'1.0-0' }}</div>
+      </div>
+    </div>
+    <div class="col-md-4">
+      <div class="ledger-card">
+        <div class="ledger-label">Goal timeline</div>
+        <span class="status-stamp" [class.status-approved]="result.goalAchievableInTimeline" [class.status-pending]="!result.goalAchievableInTimeline">
+          <span class="dot"></span>{{ result.goalAchievableInTimeline ? 'Achievable' : 'Needs adjustment' }}
+        </span>
+        <div class="mt-2" style="font-size:0.85rem; color: var(--ink-600);" *ngIf="result.estimatedGoalAchievementMonths">
+          Estimated {{ result.estimatedGoalAchievementMonths }} month(s) to reach goal.
+        </div>
+      </div>
+    </div>
+    <div class="col-md-4">
+      <div class="ledger-card">
+        <div class="ledger-label">Suggested investment products</div>
+        <ul class="mb-0" style="font-size:0.85rem; padding-left:1.1rem;">
+          <li *ngFor="let p of result.suggestedInvestmentProducts">{{ p }}</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <div class="card-plain mt-3">
+    <h3 style="font-size:1.0rem;">Narrative summary</h3>
+    <p style="margin-bottom:0;">{{ result.narrativeSummary }}</p>
+  </div>
+
+  <div class="card-plain mt-3" *ngIf="result.loanOptionsIfApplicable?.length">
+    <h3 style="font-size:1.0rem;">Loan options, if applicable</h3>
+    <ul style="font-size:0.9rem;">
+      <li *ngFor="let o of result.loanOptionsIfApplicable">{{ o }}</li>
+    </ul>
+  </div>
+
+  <div class="card-plain mt-3">
+    <h3 style="font-size:1.0rem;">Month-wise schedule (milestones)</h3>
+    <table class="table-ledger">
+      <thead><tr><th>Month</th><th>Planned savings</th><th>Cumulative savings</th><th>Projected corpus</th></tr></thead>
+      <tbody>
+        <tr *ngFor="let m of scheduleMilestones">
+          <td>{{ m.monthNumber }}</td>
+          <td class="amount">₹{{ m.plannedSavings | number:'1.0-0' }}</td>
+          <td class="amount">₹{{ m.cumulativeSavings | number:'1.0-0' }}</td>
+          <td class="amount amount-credit">₹{{ m.projectedCorpus | number:'1.0-0' }}</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="card-plain mt-3">
+    <h3 style="font-size:1.0rem;">Regulatory &amp; tax notes</h3>
+    <ul style="font-size:0.85rem; color: var(--ink-600);">
+      <li *ngFor="let n of result.regulatoryAndTaxNotes">{{ n }}</li>
+    </ul>
+  </div>
+</div>

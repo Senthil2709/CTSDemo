@@ -1,0 +1,43 @@
+<div class="auth-shell">
+  <div class="auth-card">
+    <div class="auth-brand">
+      <div class="brand-mark" style="background: var(--ledger-green);">L</div>
+      <div>
+        <div style="font-family: var(--font-display); font-weight:600; font-size:1.15rem; color: var(--ink-navy);">Ledger AI</div>
+        <div style="font-size:0.75rem; color: var(--ink-600); text-transform:uppercase; letter-spacing:0.06em;">Banking Assistant</div>
+      </div>
+    </div>
+
+    <h2 style="font-size:1.3rem;">Welcome back</h2>
+    <p style="color: var(--ink-600); margin-bottom:1.4rem;">Sign in to manage your accounts and talk to your AI assistant.</p>
+
+    <form [formGroup]="form" (ngSubmit)="submit()">
+      <div class="mb-3">
+        <label class="form-label">Username</label>
+        <input type="text" class="form-control" formControlName="username" placeholder="e.g. customer1">
+      </div>
+      <div class="mb-3">
+        <label class="form-label">Password</label>
+        <input type="password" class="form-control" formControlName="password" placeholder="••••••••">
+      </div>
+
+      <div class="alert alert-danger py-2" *ngIf="errorMessage">{{ errorMessage }}</div>
+
+      <button type="submit" class="btn btn-ledger w-100 mb-2" [disabled]="loading">
+        <span class="spinner-ledger me-2" *ngIf="loading"></span>
+        Sign in
+      </button>
+    </form>
+
+    <div class="ledger-stub"></div>
+
+    <div class="mb-2" style="font-size:0.8rem; color: var(--ink-600);">Try a demo account:</div>
+    <div class="d-flex gap-2 mb-3">
+      <button type="button" class="btn btn-sm btn-outline-secondary" (click)="fillDemo('customer')">Customer</button>
+      <button type="button" class="btn btn-sm btn-outline-secondary" (click)="fillDemo('rm')">RM</button>
+      <button type="button" class="btn btn-sm btn-outline-secondary" (click)="fillDemo('admin')">Branch Admin</button>
+    </div>
+
+    <div style="font-size:0.85rem;">New here? <a routerLink="/register">Create an account</a></div>
+  </div>
+</div>

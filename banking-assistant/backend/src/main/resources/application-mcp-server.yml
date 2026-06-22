@@ -1,0 +1,17 @@
+spring:
+  main:
+    # Run as a non-web process when acting as stdio MCP server
+    web-application-type: none
+  ai:
+    mcp:
+      server:
+        enabled: true
+        name: bank-audit-mcp-server
+        version: 1.0.0
+        # stdio transport — host process communicates over stdin/stdout
+        transport: stdio
+
+logging:
+  level:
+    root: WARN
+    com.bankingassistant.mcp.server: INFO
