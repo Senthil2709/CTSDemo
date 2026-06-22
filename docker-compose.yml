@@ -24,9 +24,8 @@ services:
       - banking-net
 
   backend:
-    build:
-      context: ./backend
-      dockerfile: Dockerfile
+    build: ./banking-assistant/backend
+    dockerfile: Dockerfile
     container_name: banking-assistant-backend
     restart: unless-stopped
     depends_on:
