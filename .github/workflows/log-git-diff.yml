@@ -52,19 +52,13 @@ jobs:
 
           if-no-files-found: ignore
  
-      - name: Stop existing containers
-
-        run: |
-
-          sudo docker-compose down || true
-
-        continue-on-error: true
+   
  
       - name: Build and Start services with Docker Compose
 
         run: |
 
-          sudo docker-compose up -d --build
+          sudo docker compose up -d --build
 
         env:
 
