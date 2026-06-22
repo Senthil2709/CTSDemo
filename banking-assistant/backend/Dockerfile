@@ -5,7 +5,7 @@ WORKDIR /build
 COPY /home/tekuser/Demo/banking-assistant/backend/src ./src
 RUN mvn -B -q clean package -DskipTests
 
-# ---- Runtime stage ----
+# ---- Runtime stage ------
 FROM eclipse-temurin:17-jre-jammy
 WORKDIR /app
 
