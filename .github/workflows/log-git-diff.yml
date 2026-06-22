@@ -34,17 +34,13 @@ jobs:
 
       - name: Build Docker Image from dockerfile
         run: |
-          sudo docker build -t springAIAPP:latest .
+          sudo docker build -t springaiapp:latest .
 
-      - name: Stop Existing Container
-        run: |
-          sudo docker stop springAIAPP || true
-          sudo docker rm springAIAPP || true
 
       - name: Run Docker Container
         run: |
           sudo docker run -d \
-            --name springAIAPP \
+            --name springaiapp \
             --restart unless-stopped \
             -p 9090:9090 \
             springAIAPP:latest
@@ -66,4 +62,4 @@ jobs:
       - name: Verify Deployment
         run: |
           sudo docker ps
-          sudo  docker logs springAIAPP --tail 20
+          sudo  docker logs springaiapp --tail 20
