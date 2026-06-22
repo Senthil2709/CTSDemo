@@ -43,7 +43,7 @@ jobs:
             --name springaiapp \
             --restart unless-stopped \
             -p 9090:9090 \
-            springAIAPP:latest
+            springaiapp:latest
 
       - name: Wait for Application Startup
         run: |
