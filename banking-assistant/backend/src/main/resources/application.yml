@@ -30,7 +30,7 @@ spring:
   # ─── Spring AI: OpenAI (used by MCP host to drive tool selection) ───
   ai:
     openai:
-      api-key: ${OPENAI_API_KEY:}
+      api-key: ${OPENAI_API_KEY:OFFLINE}
       chat:
         options:
           model: ${OPENAI_CHAT_MODEL:gpt-4o-mini}
