@@ -2,10 +2,13 @@
 FROM maven:3.9-eclipse-temurin-17 AS build
 WORKDIR /build
 
-COPY /home/tekuser/Demo/banking-assistant/backend/src ./src
+COPY pom.xml ./
+RUN mvn -B -q dependency:go-offline
+
+COPY src ./src
 RUN mvn -B -q clean package -DskipTests
 
-# ---- Runtime stage ------
+# ---- Runtime stage ----
 FROM eclipse-temurin:17-jre-jammy
 WORKDIR /app
 

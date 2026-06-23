@@ -1,115 +1,69 @@
 name: Log Git Diff and Deploy SpringAI APP with Docker Compose
- 
+
 on:
-
   push:
-
     tags:
-
       - 'v*'
- 
+
 jobs:
-
   deploy:
-
     runs-on: self-hosted
 
     steps:
-
       - name: Checkout repository (full history)
-
         uses: actions/checkout@v4
-
         with:
-
           fetch-depth: 0
- 
+
       - name: Run diff logger
-
         run: node scripts/log-diff.js
-
         env:
-
           BEFORE_SHA: ${{ github.event.before }}
-
           AFTER_SHA: ${{ github.event.after }}
-
           REPO_NAME: ${{ github.repository }}
-
           PUSHER: ${{ github.actor }}
-
           REF: ${{ github.ref }}
- 
+
       - name: Upload diff log as artifact
-
         uses: actions/upload-artifact@v4
-
         with:
-
           name: git-diff-log-${{ github.run_id }}
-
           path: push-logs/*.log
-
           if-no-files-found: ignore
- 
-   
- 
+
       - name: Build and Start services with Docker Compose
-
         run: |
-
           sudo docker compose up -d --build
-
         env:
-
           DB_NAME: ${{ secrets.DB_NAME || 'banking_assistant' }}
-
           DB_USER: ${{ secrets.DB_USER || 'banking_user' }}
-
-          DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
-
+          DB_PASSWORD: ${{ secrets.DB_PASSWORD || 'banking_pass' }}
           JWT_SECRET: ${{ secrets.JWT_SECRET }}
-
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          CORS_ALLOWED_ORIGINS: ${{ secrets.CORS_ALLOWED_ORIGINS || 'http://localhost:4200,http://localhost:8082' }}
 
-          CORS_ALLOWED_ORIGINS: ${{ secrets.CORS_ALLOWED_ORIGINS || 'http://localhost:4200,http://localhost:8081' }}
- 
       - name: Wait for services to be healthy
-
         run: |
-
           echo "Waiting for services to start..."
 
-          sleep 20
-
-          # Check database
-
-          echo "Checking database..."
-
-          sudo docker-compose exec -T db pg_isready -U banking_user || exit 1
-
           # Check backend
-
           echo "Checking backend..."
-
-          for i in {1..30}; do
-
+          for i in {1..40}; do
             if curl -f http://localhost:9090/actuator/health > /dev/null 2>&1; then
-
               echo "Backend is healthy"
-
               break
-
             fi
-
             echo "Attempt $i: Backend not ready yet..."
-
-            sleep 2
-
+            sleep 5
           done
- 
-     
-    
-     
- 
-     
+
+          # Check frontend
+          echo "Checking frontend..."
+          for i in {1..10}; do
+            if curl -f http://localhost:8082 > /dev/null 2>&1; then
+              echo "Frontend is healthy"
+              break
+            fi
+            echo "Attempt $i: Frontend not ready yet..."
+            sleep 3
+          done
