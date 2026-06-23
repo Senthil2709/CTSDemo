@@ -1,5 +1,6 @@
 package com.bankingassistant.mcp.host;
 
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -9,6 +10,7 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/api/audit")
+@ConditionalOnProperty(name = "spring.ai.mcp.client.enabled", havingValue = "true")
 public class AuditController {
 
     private final AuditMcpClient client;
