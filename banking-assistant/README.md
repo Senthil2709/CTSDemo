@@ -4,7 +4,7 @@ A full-stack reference implementation of the banking assistant functional
 specification: Spring Boot backend, Angular frontend, PostgreSQL +
 pgvector, all Dockerized.
 
-## Stack
+## Stack##
 
 - **Backend**: Java 17, Spring Boot 3.2.5, Spring Security (JWT, RBAC),
   Spring Data JPA, Flyway, PostgreSQL + pgvector.
